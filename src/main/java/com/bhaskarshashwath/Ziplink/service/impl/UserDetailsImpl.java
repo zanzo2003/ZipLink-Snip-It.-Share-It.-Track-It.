@@ -11,13 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Collections;
 
-
-/*
- This class implements Spring Security's UserDetails interface to provide user-specific information
- for authentication and authorization. It allows storing user details in the SecurityContext,
- eliminating the need to repeatedly fetch user data when accessing protected resources.
-*/
-
 @Data
 @NoArgsConstructor
 @Service
@@ -39,9 +32,9 @@ public class UserDetailsImpl implements UserDetails {
         this.authorities = authorities;
     }
 
-    /*
-    build method to create Spring Security UserDetails from ZipLink User class
-     */
+        /*
+        build method to create Spring Security UserDetails from ZipLink User class
+         */
 
     public static UserDetailsImpl build(User user){
         GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole());

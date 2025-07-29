@@ -1,4 +1,4 @@
 package com.bhaskarshashwath.Ziplink.service;
 
-public interface UserDetailsService {
+public interface inteface {
 }
