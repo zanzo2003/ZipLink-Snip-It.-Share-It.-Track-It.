@@ -1,5 +1,6 @@
 package com.bhaskarshashwath.Ziplink.security.jwt;
 
+import com.bhaskarshashwath.Ziplink.security.WebSecuirty;
 import com.bhaskarshashwath.Ziplink.service.impl.UserDetailsImpl;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
