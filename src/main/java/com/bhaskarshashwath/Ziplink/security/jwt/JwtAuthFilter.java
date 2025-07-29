@@ -57,6 +57,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }catch(Exception e){
             log.error("Error setting User Details in Security Context : ", e.getStackTrace());
         }
+
+        filterChain.doFilter(request, response);
     }
 
 
