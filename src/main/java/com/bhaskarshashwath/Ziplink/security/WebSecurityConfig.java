@@ -3,7 +3,6 @@ package com.bhaskarshashwath.Ziplink.security;
 
 import com.bhaskarshashwath.Ziplink.security.jwt.JwtAuthFilter;
 import com.bhaskarshashwath.Ziplink.service.impl.UserDetailsServiceImpl;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +24,6 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@AllArgsConstructor
 public class WebSecurityConfig {
 
 
@@ -40,6 +38,7 @@ public class WebSecurityConfig {
         return new JwtAuthFilter();
     }
 
+    @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
@@ -52,15 +51,13 @@ public class WebSecurityConfig {
         return authProvider;
     }
 
-
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws  Exception {
 
         http.csrf(csrf-> csrf.disable())
-                .authorizeHttpRequests(auth->
-                        auth.requestMatchers("api/auth/**").permitAll()
-                                .requestMatchers("api/url/**").authenticated()
-                                .requestMatchers("/{shortUrl}").permitAll()
-                                .anyRequest().authenticated())
+                .authorizeHttpRequests(auth-> auth
+                        .requestMatchers("/api/auth/public/register", "/api/auth/public/login", "/{shortUrl}").permitAll()
+                        .anyRequest().authenticated())
                 .cors((cors) -> cors
                         .configurationSource(apiConfigurationSource())
                 );
