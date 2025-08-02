@@ -31,6 +31,11 @@ public class GlobalExceptionhandler {
         return controllerHelper.createErrorResponse(exception.getMessage(), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiResponseDTO<Object>> invalidCredentials(InvalidCredentialsException exception){
+        return controllerHelper.createErrorResponse(exception.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponseDTO<Object>> handleGenericException(Exception exception) {

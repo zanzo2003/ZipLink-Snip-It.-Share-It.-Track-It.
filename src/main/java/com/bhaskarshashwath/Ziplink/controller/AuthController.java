@@ -3,10 +3,11 @@ package com.bhaskarshashwath.Ziplink.controller;
 
 import com.bhaskarshashwath.Ziplink.controller.common.ControllerHelper;
 import com.bhaskarshashwath.Ziplink.domain.User;
+import com.bhaskarshashwath.Ziplink.model.JwtAuthDTO;
+import com.bhaskarshashwath.Ziplink.model.LoginDTO;
 import com.bhaskarshashwath.Ziplink.model.UserDTO;
 import com.bhaskarshashwath.Ziplink.model.common.ApiResponseDTO;
 import com.bhaskarshashwath.Ziplink.service.UserService;
-import com.bhaskarshashwath.Ziplink.service.impl.UserDetailsServiceImpl;
 import lombok.NonNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,13 @@ public class AuthController {
         newUser = userService.registerUser(newUser);
         BeanUtils.copyProperties(newUser, newUserDetails);
         return controllerHelper.createOkResponse(newUserDetails, "registration successful");
+    }
+
+    @PostMapping("/public/login")
+    public ResponseEntity<ApiResponseDTO<JwtAuthDTO>> loginUser(
+            @RequestBody @NonNull LoginDTO loginDetails
+            ){
+        return controllerHelper.createOkResponse(userService.authenticateUser(loginDetails), "Login Successful");
     }
 
 }
