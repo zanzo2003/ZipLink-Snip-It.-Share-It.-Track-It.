@@ -11,6 +11,10 @@ import com.bhaskarshashwath.Ziplink.security.jwt.JwtUtils;
 import com.bhaskarshashwath.Ziplink.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +32,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @Override
     @Transactional
@@ -60,12 +67,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public JwtAuthDTO authenticateUser(LoginDTO loginDetails) throws InvalidCredentialsException{
-        User userDetails = getByUsername(loginDetails.getUsername());
-        if( !passwordEncoder.matches(loginDetails.getPassword(), userDetails.getPassword())){
-            throw new InvalidCredentialsException("Invalid Credentials");
-        }
-        UserDetailsImpl details = UserDetailsImpl.build(userDetails);
+    public JwtAuthDTO authenticateUser(LoginDTO loginDetails) throws InvalidCredentialsException, ResourceNotFoundExcpetion {
+//        User userDetails = getByUsername(loginDetails.getUsername());
+//        if( !passwordEncoder.matches(loginDetails.getPassword(), userDetails.getPassword())){
+//            throw new InvalidCredentialsException("Invalid Credentials");
+//        }
+//        UserDetailsImpl details = UserDetailsImpl.build(userDetails);
+//        return JwtAuthDTO.builder().token(jwtUtils.generateToken(details)).build();
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDetails.getUsername(), loginDetails.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
         return JwtAuthDTO.builder().token(jwtUtils.generateToken(details)).build();
     }
 
