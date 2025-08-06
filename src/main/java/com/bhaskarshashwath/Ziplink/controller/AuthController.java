@@ -6,11 +6,11 @@ import com.bhaskarshashwath.Ziplink.domain.User;
 import com.bhaskarshashwath.Ziplink.model.JwtAuthDTO;
 import com.bhaskarshashwath.Ziplink.model.LoginDTO;
 import com.bhaskarshashwath.Ziplink.model.UserDTO;
-import com.bhaskarshashwath.Ziplink.model.common.ApiResponseDTO;
+import com.bhaskarshashwath.Ziplink.response.ApiResponseDTO;
 import com.bhaskarshashwath.Ziplink.service.UserService;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,13 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/auth")
+@AllArgsConstructor
 public class AuthController {
 
 
-    @Autowired
     private UserService userService;
 
-    @Autowired
     private ControllerHelper controllerHelper;
 
     @PostMapping("/public/register")

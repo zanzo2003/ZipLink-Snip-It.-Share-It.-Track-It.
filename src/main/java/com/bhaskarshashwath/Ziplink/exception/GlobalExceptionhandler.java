@@ -2,7 +2,7 @@ package com.bhaskarshashwath.Ziplink.exception;
 
 
 import com.bhaskarshashwath.Ziplink.controller.common.ControllerHelper;
-import com.bhaskarshashwath.Ziplink.model.common.ApiResponseDTO;
+import com.bhaskarshashwath.Ziplink.response.ApiResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
