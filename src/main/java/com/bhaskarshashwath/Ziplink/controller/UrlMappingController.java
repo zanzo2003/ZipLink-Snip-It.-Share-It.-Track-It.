@@ -12,12 +12,10 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/urls")
@@ -38,6 +36,14 @@ public class UrlMappingController {
             ){
         User user = userService.getByUsername(principal.getName());
         return controllerHelper.createOkResponse( mappingService.createMapping(request, user), "Mapping created successfully");
+    }
+
+
+    @GetMapping("/my-urls")
+    public ResponseEntity<ApiResponseDTO<List<UrlMappingDTO>>> getUserUrls(Principal principal){
+
+        User user = userService.getByUsername(principal.getName());
+        return controllerHelper.createOkResponse(mappingService.getUrlsByUser(user), "Shorturls retrieved for user");
     }
 
 
