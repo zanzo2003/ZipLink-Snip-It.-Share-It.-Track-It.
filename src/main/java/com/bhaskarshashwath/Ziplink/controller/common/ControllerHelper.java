@@ -1,6 +1,7 @@
 package com.bhaskarshashwath.Ziplink.controller.common;
 
 import com.bhaskarshashwath.Ziplink.response.ApiResponseDTO;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,10 @@ public class ControllerHelper {
         response.setSuccessMessage(message);
         response.setData(data);
         return new ResponseEntity<>(response, status);
+    }
+
+    public <T> ResponseEntity<Void> redirectResponse( String message, HttpStatus status, HttpHeaders headers) {
+        return ResponseEntity.status(status).headers(headers).build();
     }
 
     public ResponseEntity<ApiResponseDTO<Object>> createSuccessResponse(String message, HttpStatus status) {

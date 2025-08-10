@@ -50,7 +50,7 @@ public class AnalyticsController {
 
 
 
-    @GetMapping("/totalClicks")
+    @GetMapping("/total-clicks")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ApiResponseDTO<Map<LocalDate, Long>>> getTotalClicksByDate(
             Principal principal,
