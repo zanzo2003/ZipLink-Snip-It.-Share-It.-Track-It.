@@ -9,6 +9,7 @@ import com.bhaskarshashwath.Ziplink.service.UrlMappingService;
 import com.bhaskarshashwath.Ziplink.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/analytics")
@@ -35,7 +37,7 @@ public class AnalyticsController {
             @PathVariable @NonNull String shortUrl,
             @RequestParam("startDate") @NonNull String startDate,
             @RequestParam("endDate") @NonNull String endDate){
-
+        log.info("Analytics for URL {} from {} to {}", shortUrl, startDate, endDate);
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
         LocalDateTime start = LocalDateTime.parse(startDate, formatter);
         LocalDateTime end = LocalDateTime.parse(endDate, formatter);
@@ -57,7 +59,7 @@ public class AnalyticsController {
             @RequestParam("startDate") @NonNull String startDate,
             @RequestParam("endDate") @NonNull String endDate
             ){
-
+        log.info("Request for data from user:  {} ", principal.getName());
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
         LocalDate start = LocalDate.parse(startDate, formatter);
         LocalDate end = LocalDate.parse(endDate, formatter);

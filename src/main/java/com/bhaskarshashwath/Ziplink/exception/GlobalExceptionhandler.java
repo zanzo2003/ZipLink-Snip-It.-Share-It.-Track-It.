@@ -1,14 +1,15 @@
 package com.bhaskarshashwath.Ziplink.exception;
 
-
 import com.bhaskarshashwath.Ziplink.controller.common.ControllerHelper;
 import com.bhaskarshashwath.Ziplink.response.ApiResponseDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionhandler {
 
@@ -16,29 +17,32 @@ public class GlobalExceptionhandler {
     private ControllerHelper controllerHelper;
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiResponseDTO<Object>> handleIllegalArgument(IllegalArgumentException exception){
+    public ResponseEntity<ApiResponseDTO<Object>> handleIllegalArgument(IllegalArgumentException exception) {
+        log.warn("IllegalArgumentException: {}", exception.getMessage());
         return controllerHelper.createErrorResponse(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-
     @ExceptionHandler(ResourceNotFoundExcpetion.class)
-    public ResponseEntity<ApiResponseDTO<Object>> handleResourcenotFound(ResourceNotFoundExcpetion exception){
+    public ResponseEntity<ApiResponseDTO<Object>> handleResourcenotFound(ResourceNotFoundExcpetion exception) {
+        log.warn("ResourceNotFoundException: {}", exception.getMessage());
         return controllerHelper.createErrorResponse(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UsernameAlreadyExistsException.class)
-    public ResponseEntity<ApiResponseDTO<Object>> usernameNotUnique(UsernameAlreadyExistsException exception){
+    public ResponseEntity<ApiResponseDTO<Object>> usernameNotUnique(UsernameAlreadyExistsException exception) {
+        log.warn("UsernameAlreadyExistsException: {}", exception.getMessage());
         return controllerHelper.createErrorResponse(exception.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<ApiResponseDTO<Object>> invalidCredentials(InvalidCredentialsException exception){
+    public ResponseEntity<ApiResponseDTO<Object>> invalidCredentials(InvalidCredentialsException exception) {
+        log.warn("InvalidCredentialsException: {}", exception.getMessage());
         return controllerHelper.createErrorResponse(exception.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponseDTO<Object>> handleGenericException(Exception exception) {
-        return controllerHelper.createErrorResponse(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        log.error("Unhandled Exception occurred: {}", exception.getMessage(), exception);
+        return controllerHelper.createErrorResponse("An unexpected error occurred. Please try again later.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
