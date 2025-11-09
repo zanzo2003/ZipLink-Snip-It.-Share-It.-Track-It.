@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -75,11 +76,18 @@ public class UserServiceImpl implements UserService {
 //        UserDetailsImpl details = UserDetailsImpl.build(userDetails);
 //        return JwtAuthDTO.builder().token(jwtUtils.generateToken(details)).build();
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDetails.getUsername(), loginDetails.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        return JwtAuthDTO.builder().token(jwtUtils.generateToken(details)).build();
+        JwtAuthDTO dto = null;
+        try{
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginDetails.getUsername(), loginDetails.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+            dto = JwtAuthDTO.builder().token(jwtUtils.generateToken(details)).build();
+        }
+        catch(AuthenticationException exception){
+            throw new InvalidCredentialsException("Invalid Credentials");
+        }
+        return dto;
     }
 
 

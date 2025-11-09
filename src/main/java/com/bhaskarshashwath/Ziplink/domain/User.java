@@ -2,17 +2,14 @@ package com.bhaskarshashwath.Ziplink.domain;
 
 
 import com.bhaskarshashwath.Ziplink.domain.core.DomainCore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Getter
 @Setter
 @ToString(exclude = {"password"})
-@Table(name = "users")
+@Table(name = "users", indexes = @Index(columnList = "username"))
 public class User extends DomainCore {
 
 

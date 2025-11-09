@@ -9,7 +9,7 @@ import lombok.Data;
 import java.util.List;
 
 @Entity
-@Table(name = "url_mapping")
+@Table(name = "url_mapping", indexes = @Index(columnList = "shortUrl"))
 @Data
 public class UrlMapping extends DomainCore {
 
