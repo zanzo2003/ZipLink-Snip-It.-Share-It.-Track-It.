@@ -1,4 +1,4 @@
-package com.bhaskarshashwath.Ziplink.repository;
+package com.bhaskarshashwath.Ziplink.mappers.repository;
 
 import com.bhaskarshashwath.Ziplink.domain.UrlMapping;
 import com.bhaskarshashwath.Ziplink.domain.User;

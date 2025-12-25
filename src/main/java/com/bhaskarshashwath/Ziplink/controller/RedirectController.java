@@ -4,7 +4,6 @@ package com.bhaskarshashwath.Ziplink.controller;
 
 import com.bhaskarshashwath.Ziplink.controller.common.ControllerHelper;
 import com.bhaskarshashwath.Ziplink.domain.UrlMapping;
-import com.bhaskarshashwath.Ziplink.response.ApiResponseDTO;
 import com.bhaskarshashwath.Ziplink.service.UrlMappingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;

@@ -6,7 +6,7 @@ import com.bhaskarshashwath.Ziplink.domain.User;
 import com.bhaskarshashwath.Ziplink.model.JwtAuthDTO;
 import com.bhaskarshashwath.Ziplink.model.LoginDTO;
 import com.bhaskarshashwath.Ziplink.model.UserDTO;
-import com.bhaskarshashwath.Ziplink.response.ApiResponseDTO;
+import com.bhaskarshashwath.Ziplink.model.response.ApiResponseDTO;
 import com.bhaskarshashwath.Ziplink.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -39,7 +39,7 @@ public class AuthController {
         newUser.setRole("ROLE_USER");
         newUser = userService.registerUser(newUser);
         BeanUtils.copyProperties(newUser, newUserDetails);
-        return controllerHelper.createOkResponse(newUserDetails, "registration successful");
+        return controllerHelper.createCreatedResponse(newUserDetails, "registration successful");
     }
 
     @PostMapping("/public/login")

@@ -4,8 +4,8 @@ package com.bhaskarshashwath.Ziplink.controller;
 import com.bhaskarshashwath.Ziplink.controller.common.ControllerHelper;
 import com.bhaskarshashwath.Ziplink.domain.User;
 import com.bhaskarshashwath.Ziplink.model.UrlMappingDTO;
-import com.bhaskarshashwath.Ziplink.response.ApiResponseDTO;
-import com.bhaskarshashwath.Ziplink.request.UrlMappingRequest;
+import com.bhaskarshashwath.Ziplink.model.response.ApiResponseDTO;
+import com.bhaskarshashwath.Ziplink.model.request.UrlMappingRequest;
 import com.bhaskarshashwath.Ziplink.service.UrlMappingService;
 import com.bhaskarshashwath.Ziplink.service.impl.UserServiceImpl;
 import lombok.AllArgsConstructor;
@@ -35,7 +35,7 @@ public class UrlMappingController {
             Principal principal
             ){
         User user = userService.getByUsername(principal.getName());
-        return controllerHelper.createOkResponse( mappingService.createMapping(request, user), "Mapping created successfully");
+        return controllerHelper.createCreatedResponse( mappingService.createMapping(request, user), "Mapping created successfully");
     }
 
 

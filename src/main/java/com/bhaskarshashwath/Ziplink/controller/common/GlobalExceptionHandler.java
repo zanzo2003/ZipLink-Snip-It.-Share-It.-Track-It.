@@ -1,7 +1,9 @@
-package com.bhaskarshashwath.Ziplink.exception;
+package com.bhaskarshashwath.Ziplink.controller.common;
 
-import com.bhaskarshashwath.Ziplink.controller.common.ControllerHelper;
-import com.bhaskarshashwath.Ziplink.response.ApiResponseDTO;
+import com.bhaskarshashwath.Ziplink.exception.InvalidCredentialsException;
+import com.bhaskarshashwath.Ziplink.exception.ResourceNotFoundExcpetion;
+import com.bhaskarshashwath.Ziplink.exception.UsernameAlreadyExistsException;
+import com.bhaskarshashwath.Ziplink.model.response.ApiResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @Slf4j
 @ControllerAdvice
-public class GlobalExceptionhandler {
+public class GlobalExceptionHandler {
 
     @Autowired
     private ControllerHelper controllerHelper;
@@ -45,4 +47,5 @@ public class GlobalExceptionhandler {
         log.error("Unhandled Exception occurred: {}", exception.getMessage(), exception);
         return controllerHelper.createErrorResponse("An unexpected error occurred. Please try again later.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 }

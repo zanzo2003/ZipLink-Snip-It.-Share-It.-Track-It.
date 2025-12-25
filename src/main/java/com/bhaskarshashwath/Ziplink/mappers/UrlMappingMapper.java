@@ -4,7 +4,7 @@ package com.bhaskarshashwath.Ziplink.mappers;
 import com.bhaskarshashwath.Ziplink.domain.UrlMapping;
 import com.bhaskarshashwath.Ziplink.domain.User;
 import com.bhaskarshashwath.Ziplink.model.UrlMappingDTO;
-import com.bhaskarshashwath.Ziplink.request.UrlMappingRequest;
+import com.bhaskarshashwath.Ziplink.model.request.UrlMappingRequest;
 import org.springframework.stereotype.Component;
 
 @Component
