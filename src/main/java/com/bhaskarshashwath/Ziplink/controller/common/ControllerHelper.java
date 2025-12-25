@@ -1,6 +1,6 @@
 package com.bhaskarshashwath.Ziplink.controller.common;
 
-import com.bhaskarshashwath.Ziplink.response.ApiResponseDTO;
+import com.bhaskarshashwath.Ziplink.model.response.ApiResponseDTO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

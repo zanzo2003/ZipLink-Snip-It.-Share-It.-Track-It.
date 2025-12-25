@@ -1,4 +1,4 @@
-package com.bhaskarshashwath.Ziplink.response;
+package com.bhaskarshashwath.Ziplink.model.response;
 
 
 import lombok.Data;

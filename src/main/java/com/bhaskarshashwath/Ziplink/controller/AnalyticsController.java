@@ -4,7 +4,7 @@ package com.bhaskarshashwath.Ziplink.controller;
 import com.bhaskarshashwath.Ziplink.controller.common.ControllerHelper;
 import com.bhaskarshashwath.Ziplink.domain.User;
 import com.bhaskarshashwath.Ziplink.model.ClickEventDTO;
-import com.bhaskarshashwath.Ziplink.response.ApiResponseDTO;
+import com.bhaskarshashwath.Ziplink.model.response.ApiResponseDTO;
 import com.bhaskarshashwath.Ziplink.service.UrlMappingService;
 import com.bhaskarshashwath.Ziplink.service.UserService;
 import lombok.AllArgsConstructor;

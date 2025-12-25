@@ -6,11 +6,11 @@ import com.bhaskarshashwath.Ziplink.exception.ResourceNotFoundExcpetion;
 import com.bhaskarshashwath.Ziplink.exception.UsernameAlreadyExistsException;
 import com.bhaskarshashwath.Ziplink.model.JwtAuthDTO;
 import com.bhaskarshashwath.Ziplink.model.LoginDTO;
-import com.bhaskarshashwath.Ziplink.repository.UserRepository;
+import com.bhaskarshashwath.Ziplink.mappers.repository.UserRepository;
 import com.bhaskarshashwath.Ziplink.security.jwt.JwtUtils;
 import com.bhaskarshashwath.Ziplink.service.UserService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,21 +21,18 @@ import org.springframework.stereotype.Service;
 
 
 
-
+@AllArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JwtUtils jwtUtils;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
+
+    private final AuthenticationManager authenticationManager;
 
     @Override
     @Transactional

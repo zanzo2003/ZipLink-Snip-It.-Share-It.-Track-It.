@@ -7,13 +7,14 @@ import com.bhaskarshashwath.Ziplink.exception.ResourceNotFoundExcpetion;
 import com.bhaskarshashwath.Ziplink.mappers.UrlMappingMapper;
 import com.bhaskarshashwath.Ziplink.model.ClickEventDTO;
 import com.bhaskarshashwath.Ziplink.model.UrlMappingDTO;
-import com.bhaskarshashwath.Ziplink.repository.ClickEventRepository;
-import com.bhaskarshashwath.Ziplink.repository.UrlMappingRepository;
-import com.bhaskarshashwath.Ziplink.request.UrlMappingRequest;
+import com.bhaskarshashwath.Ziplink.mappers.repository.ClickEventRepository;
+import com.bhaskarshashwath.Ziplink.mappers.repository.UrlMappingRepository;
+import com.bhaskarshashwath.Ziplink.model.request.UrlMappingRequest;
 import com.bhaskarshashwath.Ziplink.service.UrlMappingService;
-import lombok.AllArgsConstructor;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,14 +28,17 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UrlMappingServiceImpl implements UrlMappingService{
 
-    private UrlMappingRepository repository;
+    private final UrlMappingRepository repository;
 
-    private ClickEventRepository clickEventRepository;
+    private final ClickEventRepository clickEventRepository;
 
-    private UrlMappingMapper mapper;
+    private final UrlMappingMapper mapper;
+
+    @Value("${short-url.characters}")
+    private String ALLOWED_CHARACTERS;
 
 
     @Override
@@ -108,11 +112,10 @@ public class UrlMappingServiceImpl implements UrlMappingService{
     private String generateShortUrl(String originalUrl){
 
         Random random = new Random();
-        String characters = "012345689abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         StringBuilder shortUrl = new StringBuilder(8);
 
         for(int i = 0; i < 8; i++){
-            shortUrl.append(characters.charAt(random.nextInt(characters.length())));
+            shortUrl.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
         }
         return shortUrl.toString();
     }
