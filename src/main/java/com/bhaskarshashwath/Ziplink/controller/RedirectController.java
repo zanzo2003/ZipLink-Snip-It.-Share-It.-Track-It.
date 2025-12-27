@@ -4,7 +4,7 @@ package com.bhaskarshashwath.Ziplink.controller;
 
 import com.bhaskarshashwath.Ziplink.controller.common.ControllerHelper;
 import com.bhaskarshashwath.Ziplink.domain.UrlMapping;
-import com.bhaskarshashwath.Ziplink.service.UrlMappingService;
+import com.bhaskarshashwath.Ziplink.service.UrlRedirectService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class RedirectController {
 
 
-    private UrlMappingService service;
+    private final UrlRedirectService service;
 
-    private ControllerHelper controllerHelper;
+    private final ControllerHelper controllerHelper;
 
     @GetMapping("/{shortUrl}")
     public ResponseEntity<Void> redirect(@PathVariable String shortUrl){

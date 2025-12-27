@@ -91,23 +91,6 @@ public class UrlMappingServiceImpl implements UrlMappingService{
         return result;
     }
 
-    @Override
-    public UrlMapping getOriginalMapping(String shortUrl) {
-        UrlMapping mapping =  repository.findByShortUrl(shortUrl).orElseThrow(()->new ResourceNotFoundExcpetion("Url Mapping not found"));
-        // increasing click count
-        mapping.setClickCount(mapping.getClickCount()+1);
-        mapping = repository.save(mapping);
-        log.info("Incrementing click event for mapping id :{}", mapping.getId());
-
-        //recording click event
-        ClickEvent event = new ClickEvent();
-        event.setUrlMapping(mapping);
-        clickEventRepository.save(event);
-        log.info("Recording click event for mapping id :{}", mapping.getId());
-
-        return mapping;
-    }
-
 
     private String generateShortUrl(String originalUrl){
 

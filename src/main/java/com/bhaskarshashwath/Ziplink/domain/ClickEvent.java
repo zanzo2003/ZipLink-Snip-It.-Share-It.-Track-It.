@@ -15,8 +15,7 @@ import java.time.LocalDateTime;
 @Table(name="click_event")
 public class ClickEvent extends DomainCore {
 
-    // here we will be using createdDate for a field click_date as they both store the same data. by doing so we will
-    // remove redundant storage of information
+    private Long count;
 
     @ManyToOne
     @JoinColumn(name = "url_mapping_id")
