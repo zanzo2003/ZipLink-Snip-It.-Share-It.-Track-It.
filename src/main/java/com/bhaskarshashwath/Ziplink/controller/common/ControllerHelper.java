@@ -17,8 +17,8 @@ public class ControllerHelper {
         return new ResponseEntity<>(response, status);
     }
 
-    public <T> ResponseEntity<Void> redirectResponse( String message, HttpStatus status, HttpHeaders headers) {
-        return ResponseEntity.status(status).headers(headers).build();
+    public <T> ResponseEntity<Void> redirectResponse( HttpHeaders headers) {
+        return ResponseEntity.status(HttpStatus.TEMPORARY_REDIRECT).headers(headers).build();
     }
 
     public ResponseEntity<ApiResponseDTO<Object>> createSuccessResponse(String message, HttpStatus status) {

@@ -6,21 +6,22 @@ import com.bhaskarshashwath.Ziplink.controller.common.ControllerHelper;
 import com.bhaskarshashwath.Ziplink.domain.UrlMapping;
 import com.bhaskarshashwath.Ziplink.service.UrlRedirectService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 
+
 @AllArgsConstructor
 @RestController
+@Slf4j
 public class RedirectController {
 
 
     private final UrlRedirectService service;
-
     private final ControllerHelper controllerHelper;
 
     @GetMapping("/{shortUrl}")
@@ -30,6 +31,6 @@ public class RedirectController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", urlMapping.getOriginalUrl());
         return controllerHelper
-                .redirectResponse("Redirect Succesfull", HttpStatus.TEMPORARY_REDIRECT, headers);
+                .redirectResponse(headers);
     }
 }

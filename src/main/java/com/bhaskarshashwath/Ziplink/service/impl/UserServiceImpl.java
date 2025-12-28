@@ -6,7 +6,7 @@ import com.bhaskarshashwath.Ziplink.exception.ResourceNotFoundExcpetion;
 import com.bhaskarshashwath.Ziplink.exception.UsernameAlreadyExistsException;
 import com.bhaskarshashwath.Ziplink.model.JwtAuthDTO;
 import com.bhaskarshashwath.Ziplink.model.LoginDTO;
-import com.bhaskarshashwath.Ziplink.mappers.repository.UserRepository;
+import com.bhaskarshashwath.Ziplink.repository.UserRepository;
 import com.bhaskarshashwath.Ziplink.security.jwt.JwtUtils;
 import com.bhaskarshashwath.Ziplink.service.UserService;
 import jakarta.transaction.Transactional;
@@ -27,11 +27,8 @@ public class UserServiceImpl implements UserService {
 
 
     private final PasswordEncoder passwordEncoder;
-
     private final UserRepository userRepository;
-
     private final JwtUtils jwtUtils;
-
     private final AuthenticationManager authenticationManager;
 
     @Override

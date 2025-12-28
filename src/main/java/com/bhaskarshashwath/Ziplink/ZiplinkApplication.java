@@ -11,4 +11,5 @@ public class ZiplinkApplication {
 		SpringApplication.run(ZiplinkApplication.class, args);
 	}
 
+
 }

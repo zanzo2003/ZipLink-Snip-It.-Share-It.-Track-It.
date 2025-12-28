@@ -1,4 +1,4 @@
-package com.bhaskarshashwath.Ziplink.mappers.repository;
+package com.bhaskarshashwath.Ziplink.repository;
 
 import com.bhaskarshashwath.Ziplink.domain.UrlMapping;
 import com.bhaskarshashwath.Ziplink.domain.User;
@@ -13,5 +13,6 @@ public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
 
     Optional<UrlMapping> findByShortUrl(String shortUrl);
     List<UrlMapping> findAllByUser(User user);
+    List<UrlMapping> findAllByShortUrlIn(List<String> shortUrls);
 
 }

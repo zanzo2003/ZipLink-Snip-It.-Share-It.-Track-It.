@@ -1,14 +1,13 @@
 package com.bhaskarshashwath.Ziplink.service.impl;
 
-import com.bhaskarshashwath.Ziplink.domain.ClickEvent;
 import com.bhaskarshashwath.Ziplink.domain.UrlMapping;
 import com.bhaskarshashwath.Ziplink.domain.User;
 import com.bhaskarshashwath.Ziplink.exception.ResourceNotFoundExcpetion;
 import com.bhaskarshashwath.Ziplink.mappers.UrlMappingMapper;
 import com.bhaskarshashwath.Ziplink.model.ClickEventDTO;
 import com.bhaskarshashwath.Ziplink.model.UrlMappingDTO;
-import com.bhaskarshashwath.Ziplink.mappers.repository.ClickEventRepository;
-import com.bhaskarshashwath.Ziplink.mappers.repository.UrlMappingRepository;
+import com.bhaskarshashwath.Ziplink.repository.ClickEventRepository;
+import com.bhaskarshashwath.Ziplink.repository.UrlMappingRepository;
 import com.bhaskarshashwath.Ziplink.model.request.UrlMappingRequest;
 import com.bhaskarshashwath.Ziplink.service.UrlMappingService;
 

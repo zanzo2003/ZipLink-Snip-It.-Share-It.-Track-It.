@@ -1,6 +1,7 @@
 package com.bhaskarshashwath.Ziplink.controller.common;
 
 import com.bhaskarshashwath.Ziplink.exception.InvalidCredentialsException;
+import com.bhaskarshashwath.Ziplink.exception.PersistanceFailureException;
 import com.bhaskarshashwath.Ziplink.exception.ResourceNotFoundExcpetion;
 import com.bhaskarshashwath.Ziplink.exception.UsernameAlreadyExistsException;
 import com.bhaskarshashwath.Ziplink.model.response.ApiResponseDTO;
@@ -46,6 +47,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseDTO<Object>> handleGenericException(Exception exception) {
         log.error("Unhandled Exception occurred: {}", exception.getMessage(), exception);
         return controllerHelper.createErrorResponse("An unexpected error occurred. Please try again later.", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(PersistanceFailureException.class)
+    public void handlePersistanceFailureException(PersistanceFailureException exception){
+        log.warn("Persistence Failure : {}", exception.getMessage());
     }
 
 }

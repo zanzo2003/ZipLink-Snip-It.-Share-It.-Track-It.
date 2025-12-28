@@ -1,4 +1,4 @@
-package com.bhaskarshashwath.Ziplink.mappers.repository;
+package com.bhaskarshashwath.Ziplink.repository;
 
 import com.bhaskarshashwath.Ziplink.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
