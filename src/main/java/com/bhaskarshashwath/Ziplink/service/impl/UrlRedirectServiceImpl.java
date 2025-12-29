@@ -64,6 +64,7 @@ public class UrlRedirectServiceImpl implements UrlRedirectService {
             jedis.hincrBy(statsKey, today, 1);
             log.info("Searched the Cache instead of DB for : {}", originalUrl);
             log.info("Update cache click with : {}", jedis.get(clickKey));
+            log.info("Update cache stats with : {}", jedis.hget("stats:"+shortUrl, today));
 
             UrlMapping mapping = new UrlMapping();
             mapping.setOriginalUrl(originalUrl);

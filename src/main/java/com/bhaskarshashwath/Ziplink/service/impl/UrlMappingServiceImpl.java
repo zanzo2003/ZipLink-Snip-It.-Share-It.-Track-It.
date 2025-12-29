@@ -1,5 +1,6 @@
 package com.bhaskarshashwath.Ziplink.service.impl;
 
+import com.bhaskarshashwath.Ziplink.domain.ClickEvent;
 import com.bhaskarshashwath.Ziplink.domain.UrlMapping;
 import com.bhaskarshashwath.Ziplink.domain.User;
 import com.bhaskarshashwath.Ziplink.exception.ResourceNotFoundExcpetion;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -63,11 +65,11 @@ public class UrlMappingServiceImpl implements UrlMappingService{
 
     public List<ClickEventDTO> getClickEventsByDate(String shortUrl, LocalDateTime start, LocalDateTime end){
         UrlMapping urlDetails = repository.findByShortUrl(shortUrl).orElseThrow(()->new ResourceNotFoundExcpetion("URL Details not found"));
-        return clickEventRepository.findByUrlMappingAndCreatedAtBetween(urlDetails, start, end)
+        return clickEventRepository.findByUrlMappingAndClickDateBetween(urlDetails, start.toLocalDate(), end.toLocalDate())
                 .stream()
                 .collect(Collectors
                         .groupingBy( click ->
-                                click.getCreatedAt().toLocalDate(), Collectors.counting()))
+                                click.getClickDate(), Collectors.counting()))
                 .entrySet().stream()
                 .map(entry-> {
                             ClickEventDTO result = new ClickEventDTO();
@@ -81,13 +83,17 @@ public class UrlMappingServiceImpl implements UrlMappingService{
     @Override
     public Map<LocalDate, Long> getTotalClicksByUserAndDate(User user, LocalDate start, LocalDate end) {
         List<UrlMapping> userUrls = repository.findAllByUser(user);
-        Map<LocalDate, Long> result = clickEventRepository.findByUrlMappingInAndCreatedAtBetween(userUrls, start.atStartOfDay(), end.plusDays(1).atStartOfDay())
-                .stream()
-                .collect(Collectors
-                        .groupingBy( click ->
-                                click.getCreatedAt().toLocalDate(), Collectors.counting()));
+        List<ClickEvent> analytics = clickEventRepository
+                .findByUrlMappingInAndClickDateBetween(
+                        userUrls,
+                        start.atStartOfDay().toLocalDate(),
+                        end.plusDays(1).atStartOfDay().toLocalDate());
 
-        return result;
+        return analytics.stream()
+                .collect(Collectors.groupingBy(
+                        ClickEvent::getClickDate,
+                        Collectors.summingLong(ClickEvent::getCount)
+                ));
     }
 
 

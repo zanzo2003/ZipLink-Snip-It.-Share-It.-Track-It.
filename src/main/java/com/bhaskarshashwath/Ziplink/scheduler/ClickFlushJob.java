@@ -30,105 +30,170 @@ public class ClickFlushJob {
     private final JedisPool jedisPool;
     private final ClickEventRepository clickEventRepository;
     private final UrlMappingRepository urlMappingRepository;
+
     private static final int BATCH_SIZE = 500;
 
-    @Scheduled(fixedRate = 6000)
+    @Scheduled(fixedRate = 30000)
     @SchedulerLock(name = "clickFlushJob", lockAtMostFor = "50s", lockAtLeastFor = "10s")
     @Transactional
     public void flushAnalytics() {
 
-        log.info("Started flush job at : {}", LocalDateTime.now());
+        LocalDateTime startTime = LocalDateTime.now();
+        log.info("[FLUSH_JOB] Started click analytics flush at {}", startTime);
+
         try (Jedis jedis = jedisPool.getResource()) {
+
             String cursor = "0";
-            ScanParams scanParams = new ScanParams().match("stats:*").count(BATCH_SIZE);
+            ScanParams scanParams = new ScanParams()
+                    .match("stats:*")
+                    .count(BATCH_SIZE);
+
+            int totalKeysProcessed = 0;
 
             do {
                 ScanResult<String> scanResult = jedis.scan(cursor, scanParams);
                 List<String> keys = scanResult.getResult();
+                cursor = scanResult.getCursor();
 
                 if (!keys.isEmpty()) {
+                    log.info("[FLUSH_JOB] Processing batch of {} Redis keys", keys.size());
                     processBatch(keys, jedis);
+                    totalKeysProcessed += keys.size();
                 }
 
-                cursor = scanResult.getCursor();
             } while (!cursor.equals("0"));
-            log.info("Ended flush job at : {}", LocalDateTime.now());
+
+            log.info(
+                    "[FLUSH_JOB] Completed flush at {} | Total keys processed: {}",
+                    LocalDateTime.now(),
+                    totalKeysProcessed
+            );
+
         } catch (Exception e) {
-            log.info("Failed to fluish analytics : {} ", LocalDateTime.now());
-            log.error("Failed to flush analytics", e);
+            log.error("[FLUSH_JOB] Flush failed due to exception", e);
+            throw e; // important so ShedLock releases properly
         }
     }
 
     private void processBatch(List<String> keys, Jedis jedis) {
-        // 1. Map Redis keys to Short URLs
+
+        log.debug("[FLUSH_BATCH] Starting batch processing for {} keys", keys.size());
+
+        // 1. Map Redis keys → short URLs
         Map<String, String> keyToShortUrl = keys.stream()
                 .collect(Collectors.toMap(k -> k, k -> k.replace("stats:", "")));
 
-        // 2. Fetch all UrlMappings for this batch in one query
+        log.debug(
+                "[FLUSH_BATCH] Extracted {} shortUrls from Redis keys",
+                keyToShortUrl.size()
+        );
+
+        // 2. Fetch URL mappings
         Map<String, UrlMapping> urlMap = urlMappingRepository
                 .findAllByShortUrlIn(new ArrayList<>(keyToShortUrl.values()))
                 .stream()
                 .collect(Collectors.toMap(UrlMapping::getShortUrl, u -> u));
 
-        // 3. Prepare to fetch existing ClickEvents in bulk
-        // We collect all dates and mappings to find what's already in the DB
+        log.debug(
+                "[FLUSH_BATCH] Loaded {} UrlMapping entities from DB",
+                urlMap.size()
+        );
+
         List<LocalDate> datesInBatch = new ArrayList<>();
         List<UrlMapping> mappingsInBatch = new ArrayList<>(urlMap.values());
 
-        // Temporary storage for Redis data to avoid calling hgetAll twice
+        // 3. Load Redis hash data
         Map<String, Map<String, String>> redisData = new HashMap<>();
+
         for (String key : keys) {
             Map<String, String> stats = jedis.hgetAll(key);
             redisData.put(key, stats);
             stats.keySet().forEach(d -> datesInBatch.add(LocalDate.parse(d)));
         }
 
-        List<ClickEvent> existingEvents = clickEventRepository.findAllByUrlMappingInAndClickDateIn(mappingsInBatch, datesInBatch);
+        log.debug(
+                "[FLUSH_BATCH] Loaded Redis analytics | Keys: {} | Date buckets: {}",
+                redisData.size(),
+                datesInBatch.size()
+        );
+
+        // 4. Fetch existing DB click events
+        List<ClickEvent> existingEvents =
+                clickEventRepository.findAllByUrlMappingInAndClickDateIn(
+                        mappingsInBatch,
+                        datesInBatch
+                );
+
         Map<String, ClickEvent> existingEventsMap = existingEvents.stream()
                 .collect(Collectors.toMap(
                         e -> e.getUrlMapping().getId() + "_" + e.getClickDate(),
                         e -> e
                 ));
 
-        Set<ClickEvent> toSave = new LinkedHashSet<>();
+        log.debug(
+                "[FLUSH_BATCH] Found {} existing click events in DB",
+                existingEventsMap.size()
+        );
 
-        // 5. Process the data
+        Set<ClickEvent> toSave = new LinkedHashSet<>();
+        long totalClicksAggregated = 0;
+
+        // 5. Merge Redis counts → DB entities
         for (String key : keys) {
             UrlMapping mapping = urlMap.get(keyToShortUrl.get(key));
-            if (mapping == null) continue;
+            if (mapping == null) {
+                log.warn(
+                        "[FLUSH_BATCH] UrlMapping missing for Redis key {} — skipping",
+                        key
+                );
+                continue;
+            }
 
             Map<String, String> stats = redisData.get(key);
             for (var entry : stats.entrySet()) {
                 LocalDate date = LocalDate.parse(entry.getKey());
                 long newCount = Long.parseLong(entry.getValue());
+                totalClicksAggregated += newCount;
 
                 String lookupKey = mapping.getId() + "_" + date;
                 ClickEvent event = existingEventsMap.get(lookupKey);
 
                 if (event != null) {
-                    // Update existing record
                     event.setCount(event.getCount() + newCount);
                     toSave.add(event);
                 } else {
-                    // Create new record
                     ClickEvent newEvent = ClickEvent.builder()
                             .urlMapping(mapping)
                             .clickDate(date)
                             .count(newCount)
                             .build();
                     toSave.add(newEvent);
-                    // Add to map to prevent creating duplicates within the same batch
                     existingEventsMap.put(lookupKey, newEvent);
                 }
             }
         }
 
-        // 6. Save everything and clear Redis
+        log.info(
+                "[FLUSH_BATCH] Aggregated {} click events | Total clicks: {}",
+                toSave.size(),
+                totalClicksAggregated
+        );
+
+        // 6. Persist + evict Redis
         if (!toSave.isEmpty()) {
             clickEventRepository.saveAllAndFlush(toSave);
+
             Pipeline pipeline = jedis.pipelined();
             keys.forEach(pipeline::del);
             pipeline.sync();
+
+            log.info(
+                    "[FLUSH_BATCH] Persisted {} click events and evicted {} Redis keys",
+                    toSave.size(),
+                    keys.size()
+            );
+        } else {
+            log.debug("[FLUSH_BATCH] No click events to persist in this batch");
         }
     }
 }
