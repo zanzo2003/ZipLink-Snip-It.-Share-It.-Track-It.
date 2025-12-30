@@ -25,21 +25,6 @@ public class UrlRedirectServiceImpl implements UrlRedirectService {
     private final JedisPool jedisPool;
 
 
-//    @Override
-//    public UrlMapping getOriginalMapping(String shortUrl) {
-//        UrlMapping mapping =  urlMappingRepository.findByShortUrl(shortUrl).orElseThrow(()->new ResourceNotFoundExcpetion("Url Mapping not found"));
-//        // increasing click count
-//        mapping.setClickCount(mapping.getClickCount()+1);
-//        mapping = urlMappingRepository.save(mapping);
-//
-//        //recording click event
-//        ClickEvent event = new ClickEvent();
-//        event.setUrlMapping(mapping);
-//        clickEventRepository.save(event);
-//
-//        return mapping;
-//    }
-
     @Override
     public UrlMapping getOriginalMapping(String shortUrl) {
         String urlKey = "url:" + shortUrl;

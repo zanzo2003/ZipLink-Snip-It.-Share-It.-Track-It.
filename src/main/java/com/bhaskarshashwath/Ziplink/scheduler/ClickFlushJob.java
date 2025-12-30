@@ -43,48 +43,85 @@ public class ClickFlushJob {
 
         try (Jedis jedis = jedisPool.getResource()) {
 
-            String cursor = "0";
-            ScanParams scanParams = new ScanParams()
-                    .match("stats:*")
-                    .count(BATCH_SIZE);
-
-            int totalKeysProcessed = 0;
-
-            do {
-                ScanResult<String> scanResult = jedis.scan(cursor, scanParams);
-                List<String> keys = scanResult.getResult();
-                cursor = scanResult.getCursor();
-
-                if (!keys.isEmpty()) {
-                    log.info("[FLUSH_JOB] Processing batch of {} Redis keys", keys.size());
-                    processBatch(keys, jedis);
-                    totalKeysProcessed += keys.size();
-                }
-
-            } while (!cursor.equals("0"));
-
-            log.info(
-                    "[FLUSH_JOB] Completed flush at {} | Total keys processed: {}",
-                    LocalDateTime.now(),
-                    totalKeysProcessed
-            );
+            processClickEvent(jedis);
+//            processClickCount(jedis);
 
         } catch (Exception e) {
             log.error("[FLUSH_JOB] Flush failed due to exception", e);
-            throw e; // important so ShedLock releases properly
+            throw e;
         }
     }
 
-    private void processBatch(List<String> keys, Jedis jedis) {
+    private void processClickCount(Jedis jedis){
+        String cursor = "0";
+        ScanParams scanParams = new ScanParams()
+                .match("click:*")
+                .count(BATCH_SIZE);
 
-        log.debug("[FLUSH_BATCH] Starting batch processing for {} keys", keys.size());
+        int totalKeysProcessed = 0;
+
+        do {
+            ScanResult<String> scanResult = jedis.scan(cursor, scanParams);
+            List<String> keys = scanResult.getResult();
+            cursor = scanResult.getCursor();
+
+            if (!keys.isEmpty()) {
+                log.info("[FLUSH_JOB - CLICK COUNT] Processing batch of {} Redis keys", keys.size());
+                processClickCountBatch(keys, jedis);
+                totalKeysProcessed += keys.size();
+            }
+
+        } while (!cursor.equals("0"));
+
+        log.info(
+                "[FLUSH_JOB - CLICK COUNT] flush at {} | Total keys processed: {}",
+                LocalDateTime.now(),
+                totalKeysProcessed
+        );
+
+    }
+
+    private void processClickCountBatch(List<String> keys, Jedis jedis){}
+
+    private void processClickEvent(Jedis jedis){
+        String cursor = "0";
+        ScanParams scanParams = new ScanParams()
+                .match("stats:*")
+                .count(BATCH_SIZE);
+
+        int totalKeysProcessed = 0;
+
+        do {
+            ScanResult<String> scanResult = jedis.scan(cursor, scanParams);
+            List<String> keys = scanResult.getResult();
+            cursor = scanResult.getCursor();
+
+            if (!keys.isEmpty()) {
+                log.info("[FLUSH_JOB - CLICK EVENT] Click Events Processing batch of {} Redis keys", keys.size());
+                processClickEventBatch(keys, jedis);
+                totalKeysProcessed += keys.size();
+            }
+
+        } while (!cursor.equals("0"));
+
+        log.info(
+                "[FLUSH_JOB - CLICK EVENT] flush at {} | Total keys processed: {}",
+                LocalDateTime.now(),
+                totalKeysProcessed
+        );
+
+    }
+
+    private void processClickEventBatch(List<String> keys, Jedis jedis) {
+
+        log.debug("[FLUSH_BATCH - CLICK EVENT] Starting batch processing for {} keys", keys.size());
 
         // 1. Map Redis keys → short URLs
         Map<String, String> keyToShortUrl = keys.stream()
                 .collect(Collectors.toMap(k -> k, k -> k.replace("stats:", "")));
 
         log.debug(
-                "[FLUSH_BATCH] Extracted {} shortUrls from Redis keys",
+                "[FLUSH_BATCH - CLICK EVENT] Extracted {} shortUrls from Redis keys",
                 keyToShortUrl.size()
         );
 
@@ -95,7 +132,7 @@ public class ClickFlushJob {
                 .collect(Collectors.toMap(UrlMapping::getShortUrl, u -> u));
 
         log.debug(
-                "[FLUSH_BATCH] Loaded {} UrlMapping entities from DB",
+                "[FLUSH_BATCH - CLICK EVENT] Loaded {} UrlMapping entities from DB",
                 urlMap.size()
         );
 
@@ -112,7 +149,7 @@ public class ClickFlushJob {
         }
 
         log.debug(
-                "[FLUSH_BATCH] Loaded Redis analytics | Keys: {} | Date buckets: {}",
+                "[FLUSH_BATCH - CLICK EVENT] Loaded Redis analytics | Keys: {} | Date buckets: {}",
                 redisData.size(),
                 datesInBatch.size()
         );
@@ -131,7 +168,7 @@ public class ClickFlushJob {
                 ));
 
         log.debug(
-                "[FLUSH_BATCH] Found {} existing click events in DB",
+                "[FLUSH_BATCH - CLICK EVENT] Found {} existing click events in DB",
                 existingEventsMap.size()
         );
 
@@ -143,7 +180,7 @@ public class ClickFlushJob {
             UrlMapping mapping = urlMap.get(keyToShortUrl.get(key));
             if (mapping == null) {
                 log.warn(
-                        "[FLUSH_BATCH] UrlMapping missing for Redis key {} — skipping",
+                        "[FLUSH_BATCH - CLICK EVENT] UrlMapping missing for Redis key {} — skipping",
                         key
                 );
                 continue;
@@ -174,7 +211,7 @@ public class ClickFlushJob {
         }
 
         log.info(
-                "[FLUSH_BATCH] Aggregated {} click events | Total clicks: {}",
+                "[FLUSH_BATCH - CLICK EVENT] Aggregated {} click events | Total clicks: {}",
                 toSave.size(),
                 totalClicksAggregated
         );
@@ -188,12 +225,12 @@ public class ClickFlushJob {
             pipeline.sync();
 
             log.info(
-                    "[FLUSH_BATCH] Persisted {} click events and evicted {} Redis keys",
+                    "[FLUSH_BATCH - CLICK EVENT] Persisted {} click events and evicted {} Redis keys",
                     toSave.size(),
                     keys.size()
             );
         } else {
-            log.debug("[FLUSH_BATCH] No click events to persist in this batch");
+            log.debug("[FLUSH_BATCH - CLICK EVENT] No click events to persist in this batch");
         }
     }
 }

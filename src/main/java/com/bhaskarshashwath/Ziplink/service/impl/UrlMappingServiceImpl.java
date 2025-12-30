@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -59,25 +58,23 @@ public class UrlMappingServiceImpl implements UrlMappingService{
         log.info("Retrieved {} URL mappings for user ID: {}", mappings.size(), user.getId());
         return mappings.stream()
                 .map(mapper::toDTO)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
     }
 
 
     public List<ClickEventDTO> getClickEventsByDate(String shortUrl, LocalDateTime start, LocalDateTime end){
-        UrlMapping urlDetails = repository.findByShortUrl(shortUrl).orElseThrow(()->new ResourceNotFoundExcpetion("URL Details not found"));
-        return clickEventRepository.findByUrlMappingAndClickDateBetween(urlDetails, start.toLocalDate(), end.toLocalDate())
+        UrlMapping urlDetails = repository.findByShortUrl(shortUrl)
+                .orElseThrow(()->new ResourceNotFoundExcpetion("URL Details not found"));
+
+        List<ClickEvent> urlClickEvents = clickEventRepository.findByUrlMappingAndClickDateBetween(urlDetails, start.toLocalDate(), end.toLocalDate());
+        return urlClickEvents
                 .stream()
-                .collect(Collectors
-                        .groupingBy( click ->
-                                click.getClickDate(), Collectors.counting()))
-                .entrySet().stream()
-                .map(entry-> {
-                            ClickEventDTO result = new ClickEventDTO();
-                            result.setClickDate(entry.getKey());
-                            result.setCount(entry.getValue());
-                            return result;
-                        })
-                .collect(Collectors.toList());
+                .map(entry ->{
+                        ClickEventDTO event = new ClickEventDTO();
+                        event.setClickDate(entry.getClickDate());
+                        event.setCount(entry.getCount());
+                        return event;
+                }).toList();
     }
 
     @Override
